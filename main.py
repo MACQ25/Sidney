@@ -9,8 +9,10 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 
+print("hewwo github")
+
 sidneyBot = commands.Bot(command_prefix='!',
-                         description=description,
+                         description=description,s
                          intents=intents)
 
 
