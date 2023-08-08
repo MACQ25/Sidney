@@ -1,14 +1,12 @@
 import asyncio
-
 import discord
-import youtube_dl
+import yt_dlp as youtube_dl
 from discord.ext import commands
 
 youtube_dl.utils.bug_reports_message = lambda: ""
 
 ytdl_format_options = {
-    "format": "bestaudio/best",
-    "ext": "mp3",
+    "format": "wav/bestaudio/best",
     "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
     "restrictfilenames": True,
     "noplaylist": True,
@@ -77,7 +75,8 @@ class MusicCog(commands.Cog):
                 await com.respond("done")
                 await com.voice_client.disconnect(force=True)
 
-    @commands.slash_command(name='playlocal', description='Plays from local computer (functionality on systems without ffmpeg is uncertain [likely not])')
+    @commands.slash_command(name='playlocal',
+                            description='Plays from local computer (functionality on systems without ffmpeg is uncertain [likely not])')
     async def playlocal(self, ctx, *, query: str):
         if ctx.voice_client is not None:
             source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
@@ -87,13 +86,14 @@ class MusicCog(commands.Cog):
             await ctx.respond("aven't even joined ya booksmarts!")
 
     @commands.slash_command(name='play', description='')
-    async def play(self, ctx: commands.Context, *, url: str):
+    async def play(self, ctx, *, url: str):
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            await ctx.respond(f'Now playing: {player.title}')
             ctx.voice_client.play(
                 player, after=lambda e: print(f"Player error: {e}") if e else None
             )
-            await ctx.message.respond(f'Now playing: {player.title}')
+
 
 def setup(bot):
     bot.add_cog(MusicCog(bot))
