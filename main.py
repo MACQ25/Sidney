@@ -55,7 +55,7 @@ for res in os.listdir("cogs"):
     if res.endswith(".py"):
         sidneyBot.load_extension(f'cogs.{res.replace(".py", "")}')
 
-sidneyBot.run('MTEyNDEyMDgyNDI0NTM5MTQzNA.GMOCsF.M2PNcbAYuJVgCynPOszXLuBFQ6dNIBqLf8sg8s')
+sidneyBot.run('TOKEN HERE')
 
 # Sources, some good, some unused:
 
