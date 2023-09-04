@@ -1,5 +1,5 @@
 import discord
-from discord import voice_client, Client
+from discord import voice_client
 from discord.ext import commands
 from discord import Guild
 import os
@@ -7,6 +7,8 @@ import asyncio
 import demoji
 
 # from help_cog import help_cog}
+# test list: https://youtube.com/playlist?list=PLEPuDqebgjKGE5p69MAYo1FIwKfx5w5cM
+
 
 description = "This is Sidney bot's description, make sure to write something relevant here later"
 
@@ -28,6 +30,7 @@ def struct(guild):
             "CurrentlyPlaying": None,
             "playlist": None,
             "Qn": 0,
+            "onLoop": False,
         }
     }
     return newEnt
@@ -106,5 +109,5 @@ sidneyBot.run('')
 # sauce: https://stackoverflow.com/questions/71369200/pycord-error-discord-errors-extensionfailed-extension-cogs-cmds-raised-an-er
 
 
-# YT-DLP build used, gotta check in their discord wether they can help with audio quality:
+# YT-DLP build used, gotta check in their discord whether they can help with audio quality:
 # https://github.com/yt-dlp/yt-dlp
