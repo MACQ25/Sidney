@@ -20,7 +20,7 @@ sidneyBot = commands.Bot(
     command_prefix=commands.when_mentioned_or('/'),
     description=description,
     intents=intents,
-    debug_guilds=[1124124038634156062, 708200173926481920]
+    debug_guilds=[1124124038634156062, 708200173926481920, 1031683489927532614]
 )
 
 
@@ -45,16 +45,16 @@ class ClientsData:
             cls.serverStatus.update(struct(guild))
 
     @classmethod
-    def newEntry(cls, guild):
+    async def newEntry(cls, guild):
         cls.serverStatus.update(struct(guild))
 
     @classmethod
-    def retrieve(cls, gId, key):
+    async def retrieve(cls, gId, key):
         if gId in cls.serverStatus and key in cls.serverStatus.get(gId):
             return cls.serverStatus.get(gId).get(key)
 
     @classmethod
-    def set(cls, gId, *keys: []):
+    async def set(cls, gId, *keys: []):
         if gId in cls.serverStatus:
             for pair in keys:
                 if pair[0] in cls.serverStatus.get(gId):
@@ -74,7 +74,7 @@ async def on_ready():
 
 @sidneyBot.event
 async def on_guild_join(guild: discord.Guild):
-    ClientsData.newEntry(guild)
+    await ClientsData.newEntry(guild)
     for channel in guild.text_channels:
         if channel.permissions_for(guild.me).send_messages:
             if demoji.replace(channel.name.lower().strip(), "").find("general") != -1:
@@ -89,7 +89,7 @@ async def on_guild_join(guild: discord.Guild):
 
 @sidneyBot.event
 async def on_guild_remove(guild: discord.Guild):
-    ClientsData.serverStatus.pop(guild.id)
+    await ClientsData.serverStatus.pop(guild.id)
 
 
 for res in os.listdir("cogs"):
