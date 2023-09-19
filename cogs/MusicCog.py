@@ -1,10 +1,9 @@
 import asyncio
-from asyncio import run
-from asyncio import runners
+
 import discord
 import yt_dlp as youtube_dl
-from discord import VoiceProtocol
 from discord.ext import commands
+
 from main import ClientsData
 
 # test list: https://youtube.com/playlist?list=PLEPuDqebgjKGE5p69MAYo1FIwKfx5w5cM
@@ -69,9 +68,10 @@ class MusicCog(commands.Cog):
         self.bot = bot
 
     async def playListPlayer(self, ctx, gId):
+        repeatBool = await ClientsData.retrieve(gId, "onLoop")
         playlist = await ClientsData.retrieve(gId, "playlist")
-        if playlist is not None and (await ClientsData.retrieve(gId, "Qn") < (len(playlist) - 1)):
-            if not await ClientsData.retrieve(gId, "onLoop"):
+        if playlist is not None and (await ClientsData.retrieve(gId, "Qn") < (len(playlist) - 1)) or repeatBool:
+            if not repeatBool:
                 await ClientsData.set(gId, ["Qn", await ClientsData.retrieve(gId, "Qn") + 1])
             entry = playlist[await ClientsData.retrieve(gId, "Qn")]
             player = YTDLSource.play_from_queue(entry)
@@ -80,6 +80,7 @@ class MusicCog(commands.Cog):
                 player, after=lambda e: print(f"Player error: {e}") if e else asyncio.run_coroutine_threadsafe(
                     self.playListPlayer(ctx, gId), self.bot.loop).result()
             )
+            await ctx.respond(f'Now playing: {player.title}')
         else:
             await ClientsData.set(gId, ['CurrentlyPlaying', None], ["playlist", None], ["Qn", 0])
 
@@ -100,7 +101,7 @@ class MusicCog(commands.Cog):
             ctx.voice_client.play(source, after=lambda e: print(f"Player error: {e}") if e else None)
             await ctx.respond(f'Now playing {query}')
         else:
-            await ctx.respond("aven't even joined ya booksmarts!")
+            await ctx.respond("aven't even joined yet!")
 
     @commands.slash_command(name='play', description='')
     async def play(self, ctx, *, url: str):
@@ -145,11 +146,12 @@ class MusicCog(commands.Cog):
             await ctx.respond('Sorry mate, unable to do so')
 
     @commands.slash_command(name='previous', description='Removes the current track from the queue')
-    async def w(self, ctx):
+    async def previous(self, ctx):
         if ctx.voice_client is not None and ctx.voice_client.is_playing():
             gId = ctx.guild.id
             queuePlace = await ClientsData.retrieve(gId, "Qn")
             if queuePlace > 0:
+                await ctx.responds('On it...')
                 await ClientsData.set(gId, ["Qn", queuePlace - 2])
                 ctx.voice_client.stop()
             else:
@@ -160,6 +162,7 @@ class MusicCog(commands.Cog):
     @commands.slash_command(name='skip', description='Removes the current track from the queue')
     async def skip(self, ctx):
         if ctx.voice_client is not None and ctx.voice_client.is_playing():
+            await ctx.respond('On it...')
             ctx.voice_client.stop()
         else:
             await ctx.respond('Sorry mate, unable to do so')
@@ -171,10 +174,10 @@ class MusicCog(commands.Cog):
     @commands.slash_command(name='leave', description='Tells the bot to leave the voice channel')
     async def leave(self, ctx):
         if ctx.voice_client is None:
-            await ctx.respond("I ain't in a channel ya piker!")
+            await ctx.respond("I ain't in a channel pal!")
         else:
             if ctx.voice_client.channel is not ctx.author.voice.channel:
-                await ctx.respond("You ain't in my channel ya no-hoper!")
+                await ctx.respond('Only if you are in my channel!')
             else:
                 if ctx.voice_client.is_playing():
                     ctx.voice_client.stop()
@@ -191,13 +194,6 @@ class MusicCog(commands.Cog):
             ctx.voice_client.stop()
         else:
             await ctx.respond('Sorry mate, unable to do so')
-
-    @play.after_invoke
-    @skip.after_invoke
-    @previous.after_invoke
-    async def informsong(self, ctx):
-        await asyncio.sleep(2.0)
-        await ctx.respond(f'Now playing: {await ClientsData.retrieve(ctx.guild.id, "CurrentlyPlaying")}')
 
 
 def setup(bot):

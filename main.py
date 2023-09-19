@@ -1,7 +1,6 @@
 import discord
-from discord import voice_client
-from discord.ext import commands
 from discord import Guild
+from discord.ext import commands
 import os
 import asyncio
 import demoji
@@ -79,11 +78,11 @@ async def on_guild_join(guild: discord.Guild):
         if channel.permissions_for(guild.me).send_messages:
             if demoji.replace(channel.name.lower().strip(), "").find("general") != -1:
                 print("FOUND IT:" + channel.name)
-                await channel.send("What's up ya wankers!")
+                await channel.send("Greetings!")
                 return
     for channel in guild.text_channels:
         if channel.permissions_for(guild.me).send_messages:
-            await channel.send("What's up ya wankers!")
+            await channel.send("Greetings!")
             return
 
 
